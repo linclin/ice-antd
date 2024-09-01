@@ -1,5 +1,6 @@
 import { Outlet, Link, useLocation } from 'ice';
 import ProLayout from '@ant-design/pro-layout';
+import { WaterMark } from '@ant-design/pro-components';
 import { asideMenuConfig } from '@/menuConfig';
 import AvatarDropdown from '@/components/AvatarDropdown';
 import store from '@/store';
@@ -37,7 +38,9 @@ export default function Layout() {
       }}
       footerRender={() => <Footer />}
     >
-      <Outlet />
+       <WaterMark content="运营管理后台">
+          <Outlet />
+       </WaterMark>
     </ProLayout>
   );
 }
