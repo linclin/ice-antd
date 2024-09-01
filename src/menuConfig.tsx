@@ -12,12 +12,12 @@ const asideMenuConfig: MenuDataItem[] = [
     icon: <WarningOutlined />,
     children: [
       {
-        name: '调用系统',
+        name: '外部调用系统',
         path: '/sys/sys_system',
         icon: <TableOutlined />,
       },
       {
-        name: '用户权限',
+        name: '用户角色权限',
         path: '/sys/sys_role',
         icon: <TableOutlined />,
       },

@@ -127,7 +127,7 @@ const TableList: React.FC = () => {
         //   },
         // }}
         pagination={{
-          pageSize: 1,
+          pageSize: 10,
         }}
         dateFormatter="string"
         toolBarRender={() => [

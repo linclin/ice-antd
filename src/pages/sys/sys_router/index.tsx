@@ -124,14 +124,10 @@ const TableList: React.FC = () => {
         //   },
         // }}
         pagination={{
-          pageSize: 1,
+          pageSize: 10,
         }}
         dateFormatter="string"
-        toolBarRender={() => [
-          <Button key="button" icon={<PlusOutlined />} type="primary">
-            新建
-          </Button>,
-        ]}
+        toolBarRender={() => []}
       />
     </PageContainer>
   );
