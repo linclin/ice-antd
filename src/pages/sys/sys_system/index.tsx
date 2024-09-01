@@ -103,7 +103,6 @@ const TableList: React.FC = () => {
             }
           });
           const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
-          console.log(data);
           return GetSystems(data);
         }}
         editable={{
