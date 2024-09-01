@@ -50,16 +50,11 @@ export const requestConfig = defineRequestConfig(() => ({
          if (storedApiToken) {
            const tokenData = JSON.parse(storedApiToken);
            const currentTime = Date.now();
-           // 检查token是否已过期
-           console.log('localStorage.getItem token currentTime');
-           console.log(currentTime);
-           console.log(tokenData.expires);
-           console.log(currentTime < tokenData.expires);
            if (currentTime < tokenData.expires) {
-            handleTokenExpiration(config);
-           } else {
             currentApiToken = tokenData;
             config.headers.Authorization = `Bearer ${currentApiToken.token}`;
+           } else {
+            handleTokenExpiration(config);
            }
          } else {
           handleTokenExpiration(config);
@@ -67,6 +62,7 @@ export const requestConfig = defineRequestConfig(() => ({
         return config;
       },
       onError: (error) => {
+        // 请求出错：服务端返回错误状态码
         return Promise.reject(error);
       },
     },
@@ -80,18 +76,17 @@ export const requestConfig = defineRequestConfig(() => ({
       },
       onError: (error) => {
         // 请求出错：服务端返回错误状态码
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
         return Promise.reject(error);
       },
     },
   },
 }));
 
-export const dataLoader = defineDataLoader(async () => { 
+export const dataLoader = defineDataLoader(async () => {
+  const apiToken = await getApiToken();
   const userInfo = await getUserInfo();
   return {
+    apiToken,
     userInfo,
   };
 });
@@ -106,7 +101,18 @@ async function getUserInfo() {
     };
   }
 }
-
+async function getApiToken() {
+  try {
+    const apiToken = await GetApiToken();
+    console.log('getApiToken  ', apiToken);
+    localStorage.setItem(`${ICE_API_APPID}-api-token`, JSON.stringify({ token: apiToken.token, expires: Date.now() + 7200 * 1000 }));
+    return apiToken;
+  } catch (error) {
+    return {
+      error,
+    };
+  }
+}
 function handleTokenExpiration(config) {
   if (requestLock) {
     // 如果已经有请求正在进行，则直接返回
@@ -116,7 +122,7 @@ function handleTokenExpiration(config) {
   GetApiToken()
     .then(newToken => {
       currentApiToken = newToken;
-      localStorage.setItem(`${ICE_API_APPID}-api-token`, JSON.stringify({ token: currentApiToken.token, expires: Date.now() + 7000 }));
+      localStorage.setItem(`${ICE_API_APPID}-api-token`, JSON.stringify({ token: currentApiToken.token, expires: Date.now() + 7200 * 1000 }));
       config.headers.Authorization = `Bearer ${currentApiToken.token}`;
       requestLock = false; // 释放请求锁
     })
