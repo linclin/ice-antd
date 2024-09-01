@@ -23,7 +23,8 @@ const columns: Array<ProColumns<SysSystem>> = [
     title: 'AppId',
     dataIndex: 'AppId',
     tooltip: '请求AppId',
-    width: 120,
+    copyable: true,
+    sorter: true,
   },
   {
     title: '系统',
@@ -34,6 +35,7 @@ const columns: Array<ProColumns<SysSystem>> = [
     dataIndex: 'AppSecret',
     tooltip: '请求AppSecret',
     search: false,
+    copyable: true,
     width: 200,
   },
 
@@ -49,13 +51,13 @@ const columns: Array<ProColumns<SysSystem>> = [
     title: '创建时间',
     dataIndex: 'CreatedAt',
     hideInForm: true,
-    valueType: 'datetime',
+    valueType: 'dateTime',
   },
   {
     title: '更新时间',
     dataIndex: 'UpdatedAt',
     hideInForm: true,
-    valueType: 'datetime',
+    valueType: 'dateTime',
   },
   {
     title: '操作',
@@ -87,11 +89,20 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const offset = (params.current - 1) * params.pageSize;
+          console.log(params, sort, filter);
+          const apiOffset = (params.current - 1) * params.pageSize;
           const filteredParams = { ...params };
           delete filteredParams.current;
           delete filteredParams.pageSize;
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: offset, select: [], sort: [] };
+          const apiSort: string[] = [];
+          Object.entries(sort).forEach(([key, value]) => {
+            if (value === 'descend') {
+              apiSort.push(`-${key}`)
+            } else {
+              apiSort.push(`${key}`)
+            }
+          });
+          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           console.log(data);
           return GetSystems(data);
         }}
@@ -108,6 +119,9 @@ const TableList: React.FC = () => {
         rowKey="ID"
         search={{
           labelWidth: 'auto',
+        }}
+        dateFormatter={(value, valueType) => {
+          return value.format('YYYY-MM-DD HH:mm:ss');
         }}
         options={{
           setting: {

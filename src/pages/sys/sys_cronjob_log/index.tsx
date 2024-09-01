@@ -63,11 +63,19 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const offset = (params.current - 1) * params.pageSize;
+          const apiOffset = (params.current - 1) * params.pageSize;
           const filteredParams = { ...params };
           delete filteredParams.current;
           delete filteredParams.pageSize;
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: offset, select: [], sort: [] };
+          const apiSort: string[] = [];
+          Object.entries(sort).forEach(([key, value]) => {
+            if (value === 'descend') {
+              apiSort.push(`-${key}`)
+            } else {
+              apiSort.push(`${key}`)
+            }
+          });
+          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           console.log(data);
           return GetCronjobLog(data);
         }}

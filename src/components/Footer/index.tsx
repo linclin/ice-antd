@@ -9,6 +9,18 @@ const Footer: React.FC = () => {
       copyright={`${currentYear} 运营管理后台`}
       links={[
         {
+          key: 'ice-antd',
+          title: <GithubOutlined />,
+          href: 'https://github.com/linclin/ice-antd',
+          blankTarget: true,
+        },
+        {
+          key: 'ice-antd-github',
+          title: 'ice-antd前端框架',
+          href: 'https://github.com/linclin/ice-antd',
+          blankTarget: true,
+        },
+        {
           key: 'go-gin-rest-api',
           title: <GithubOutlined />,
           href: 'https://github.com/linclin/go-gin-rest-api',
@@ -16,7 +28,7 @@ const Footer: React.FC = () => {
         },
         {
           key: 'go-gin-rest-api-github',
-          title: 'go-gin-rest-api',
+          title: 'go-gin-rest-api后台框架',
           href: 'https://github.com/linclin/go-gin-rest-api',
           blankTarget: true,
         },
