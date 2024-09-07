@@ -6,17 +6,9 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { GetRoles } from '@/services/sys/sys_role';
-
-interface SysRole {
-  ID: number;
-  Name: string;
-  Keyword: string;
-  Desc: string;
-  Status: string;
-  Operator: string;
-  CreatedAt: string;
-  UpdatedAt: string;
-}
+import type { SysRole } from '@/interfaces/sys';
+import type { Req } from '@/interfaces/resp';
+import { RemoveEmptyKeys } from '@/utils/obj';
 
 const columns: Array<ProColumns<SysRole>> = [
   {
@@ -47,13 +39,13 @@ const columns: Array<ProColumns<SysRole>> = [
     title: '创建时间',
     dataIndex: 'CreatedAt',
     hideInForm: true,
-    valueType: 'datetime',
+    valueType: 'dateTime',
   },
   {
     title: '更新时间',
     dataIndex: 'UpdatedAt',
     hideInForm: true,
-    valueType: 'datetime',
+    valueType: 'dateTime',
   },
   {
     title: '操作',
@@ -85,19 +77,20 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const apiOffset = (params.current - 1) * params.pageSize;
-          const filteredParams = { ...params };
+          const currentPage = params.current !== undefined ? params.current : 1;  
+          const apiOffset = (currentPage - 1) * 10;
+          const filteredParams = RemoveEmptyKeys(params);
           delete filteredParams.current;
           delete filteredParams.pageSize;
           const apiSort: string[] = [];
           Object.entries(sort).forEach(([key, value]) => {
             if (value === 'descend') {
-              apiSort.push(`-${key}`)
+              apiSort.push(`-${key}`);
             } else {
-              apiSort.push(`${key}`)
+              apiSort.push(`${key}`);
             }
           });
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
+          const data: Req = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           return GetRoles(data);
         }}
         editable={{

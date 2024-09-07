@@ -6,19 +6,9 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { GetApiLog } from '@/services/sys/sys_api_log';
-
-interface SysApiLog {
-  ID: number;
-  RequestId: string;
-  RequestMethod: string;
-  RequestURI: string;
-  RequestBody: string;
-  StatusCode: string;
-  RespBody: string;
-  ClientIP: string;
-  StartTime: string;
-  ExecTime: string;
-}
+import type { SysApiLog } from '@/interfaces/sys';
+import type { Req } from '@/interfaces/resp';
+import { RemoveEmptyKeys } from '@/utils/obj';
 
 const columns: Array<ProColumns<SysApiLog>> = [
   {
@@ -53,14 +43,11 @@ const columns: Array<ProColumns<SysApiLog>> = [
   {
     title: '创建时间',
     dataIndex: 'StartTime',
-    hideInForm: true,
-    valueType: 'datetime',
+    valueType: 'dateTime',
   },
   {
     title: '执行时间',
     dataIndex: 'ExecTime',
-    hideInForm: true,
-    valueType: 'datetime',
   },
 ];
 
@@ -73,19 +60,20 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const apiOffset = (params.current - 1) * params.pageSize;
-          const filteredParams = { ...params };
+          const currentPage = params.current !== undefined ? params.current : 1;  
+          const apiOffset = (currentPage - 1) * 10;
+          const filteredParams = RemoveEmptyKeys(params);
           delete filteredParams.current;
           delete filteredParams.pageSize;
           const apiSort: string[] = [];
           Object.entries(sort).forEach(([key, value]) => {
             if (value === 'descend') {
-              apiSort.push(`-${key}`)
+              apiSort.push(`-${key}`);
             } else {
-              apiSort.push(`${key}`)
+              apiSort.push(`${key}`);
             }
           });
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
+          const data: Req = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           return GetApiLog(data);
         }}
         editable={{

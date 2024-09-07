@@ -6,17 +6,9 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { GetRouters } from '@/services/sys/sys_router';
-
-interface SysRouter {
-  ID: number;
-  Name: string;
-  SystemName: string;
-  Group: string;
-  HttpMethod: string;
-  AbsolutePath: string;
-  CreatedAt: string;
-  UpdatedAt: string;
-}
+import type { SysRouter } from '@/interfaces/sys';
+import type { Req } from '@/interfaces/resp';
+import { RemoveEmptyKeys } from '@/utils/obj';
 
 const columns: Array<ProColumns<SysRouter>> = [
   {
@@ -84,19 +76,20 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const apiOffset = (params.current - 1) * params.pageSize;
-          const filteredParams = { ...params };
+          const currentPage = params.current !== undefined ? params.current : 1; // 默认值设为1
+          const apiOffset = (currentPage - 1) * 10;
+          const filteredParams = RemoveEmptyKeys(params);
           delete filteredParams.current;
           delete filteredParams.pageSize;
           const apiSort: string[] = [];
           Object.entries(sort).forEach(([key, value]) => {
             if (value === 'descend') {
-              apiSort.push(`-${key}`)
+              apiSort.push(`-${key}`);
             } else {
-              apiSort.push(`${key}`)
+              apiSort.push(`${key}`);
             }
           });
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
+          const data: Req = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           return GetRouters(data);
         }}
         editable={{

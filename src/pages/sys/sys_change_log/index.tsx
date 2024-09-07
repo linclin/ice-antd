@@ -6,48 +6,37 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { GetChangeLog } from '@/services/sys/sys_change_log';
-
-interface ChangeLog {
-  ID: number;
-  Action: string;
-  ObjectID: string;
-  ObjectType: string;
-  RawObject: string;
-  RawMeta: string;
-  RawDiff: string;
-  CreatedBy: string;
-  Object: string;
-  Meta: string;
-}
+import type { ChangeLog } from '@/interfaces/sys';
+import type { Req } from '@/interfaces/resp';
+import { RemoveEmptyKeys } from '@/utils/obj';
 
 const columns: Array<ProColumns<ChangeLog>> = [
   {
-    title: 'Action',
+    title: '动作',
     dataIndex: 'Action',
   },
   {
-    title: 'ObjectID',
+    title: '数据表',
+    dataIndex: 'ObjectType',
+  },
+  {
+    title: '主键',
     dataIndex: 'ObjectID',
   },
   {
-    title: 'ObjectType',
-    dataIndex: 'ObjectType',
-  },
-
-  {
-    title: 'RawObject',
+    title: '修改内容',
     dataIndex: 'RawObject',
   },
   {
-    title: 'RawMeta',
+    title: '标签',
     dataIndex: 'RawMeta',
   },
   {
-    title: 'RawDiff',
+    title: '数据对比',
     dataIndex: 'RawDiff',
   },
   {
-    title: 'CreatedBy',
+    title: '操作源',
     dataIndex: 'CreatedBy',
   },
   {
@@ -69,19 +58,20 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const apiOffset = (params.current - 1) * params.pageSize;
-          const filteredParams = { ...params };
+          const currentPage = params.current !== undefined ? params.current : 1;  
+          const apiOffset = (currentPage - 1) * 10;
+          const filteredParams = RemoveEmptyKeys(params);
           delete filteredParams.current;
           delete filteredParams.pageSize;
           const apiSort: string[] = [];
           Object.entries(sort).forEach(([key, value]) => {
             if (value === 'descend') {
-              apiSort.push(`-${key}`)
+              apiSort.push(`-${key}`);
             } else {
-              apiSort.push(`${key}`)
+              apiSort.push(`${key}`);
             }
           });
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
+          const data: Req = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           return GetChangeLog(data);
         }}
         editable={{

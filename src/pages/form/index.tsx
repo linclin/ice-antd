@@ -23,7 +23,6 @@ export default function Form() {
     <PageContainer content="表单页用于向用户收集或验证信息，基础表单常见于数据项较少的表单场景。">
       <Card bordered={false}>
         <ProForm
-          hideRequiredMark
           style={{ margin: 'auto', marginTop: 8, maxWidth: 600 }}
           name="basic"
           layout="vertical"

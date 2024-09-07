@@ -1,5 +1,5 @@
 import { request } from 'ice';
-
-export async function GetChangeLog(data) {
+import type { Req, Resp } from '@/interfaces/resp';
+export async function GetChangeLog(data: Req): Promise<Resp> {
  return await request.post('/api/v1/changelog/list', data);
 }

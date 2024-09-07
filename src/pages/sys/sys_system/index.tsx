@@ -1,108 +1,116 @@
 import { definePageConfig } from 'ice';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import React, { useRef } from 'react';
+import { Modal, message } from 'antd';
+import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { GetSystems } from '@/services/sys/sys_system';
-
-interface SysSystem {
-  ID: number;
-  AppId: string;
-  SystemName: string;
-  AppSecret: string;
-  IP: string;
-  Operator: string;
-  CreatedAt: string;
-  UpdatedAt: string;
-}
-
-const columns: Array<ProColumns<SysSystem>> = [
-  {
-    title: 'AppId',
-    dataIndex: 'AppId',
-    tooltip: '请求AppId',
-    copyable: true,
-    sorter: true,
-  },
-  {
-    title: '系统',
-    dataIndex: 'SystemName',
-  },
-  {
-    title: 'AppSecret',
-    dataIndex: 'AppSecret',
-    tooltip: '请求AppSecret',
-    search: false,
-    copyable: true,
-    width: 200,
-  },
-
-  {
-    title: '来源IP',
-    dataIndex: 'IP',
-  },
-  {
-    title: '操作人',
-    dataIndex: 'Operator',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'CreatedAt',
-    hideInForm: true,
-    valueType: 'dateTime',
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'UpdatedAt',
-    hideInForm: true,
-    valueType: 'dateTime',
-  },
-  {
-    title: '操作',
-    valueType: 'option',
-    key: 'option',
-    width: 200,
-    render: (text, record, _, action) => [
-      <a
-        key="editable"
-        onClick={() => {
-          action?.startEditable?.(record.ID);
-        }}
-      >
-        编辑
-      </a>,
-      <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-        查看
-      </a>,
-    ],
-  },
-];
+import { GetSystems, DeleteSystemById } from '@/services/sys/sys_system';
+import CreateSystem from './components/CreateSystem';
+import UpdateSystem from './components/UpdateSystem';
+import { ProFormColumnsType } from '@ant-design/pro-form';
+import type { SysSystem } from '@/interfaces/sys';
+import type { Req } from '@/interfaces/resp';
+import { RemoveEmptyKeys } from '@/utils/obj';
 
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const [showDetail, setShowDetail] = useState<boolean>(false);
+  const [currentRow, setCurrentRow] = useState<SysSystem>(); 
+  const [messageApi, contextHolder] = message.useMessage();
+  const columns: Array<ProColumns<SysSystem>> = [
+    {
+      title: 'AppId',
+      dataIndex: 'AppId',
+      tooltip: '请求AppId',
+      copyable: true,
+      sorter: true,
+    },
+    {
+      title: '系统',
+      dataIndex: 'SystemName',
+    },
+    {
+      title: 'AppSecret',
+      dataIndex: 'AppSecret',
+      tooltip: '请求AppSecret',
+      search: false,
+      copyable: true,
+    },
+    {
+      title: '来源IP',
+      dataIndex: 'IP',
+    },
+    {
+      title: '操作人',
+      dataIndex: 'Operator',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'CreatedAt',
+      hideInForm: true,
+      valueType: 'dateTime',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'UpdatedAt',
+      hideInForm: true,
+      valueType: 'dateTime',
+    },
+    {
+      title: '操作',
+      valueType: 'option',
+      key: 'option',
+      width: 100,
+      render: (text, record, _, action) => [
+        <>
+          <UpdateSystem
+            key="config"
+            reload={actionRef.current?.reload}
+            columns={columns as ProFormColumnsType<SysSystem, 'text'>[]}
+            data={record}
+          />,
+          <a style={{ marginLeft: 8 }} onClick={() => handleDelete(record)}>删除</a>
+        </>,
+      ],
+    },
+  ];
+  const handleDelete = (record: SysSystem) => {
+    Modal.confirm({
+      title: `确认删除${record.AppId}?`,
+      onOk: async () => {
+        try {
+          await DeleteSystemById(record.ID);
+          messageApi.success(`${record.AppId}删除成功`);
+          actionRef.current?.reload();
+        } catch (error) {
+          messageApi.error(`${record.AppId}删除失败:${error}`);
+        }
+      },
+    });
+  };
+
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<SysSystem>
         columns={columns}
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          console.log(params, sort, filter);
-          const apiOffset = (params.current - 1) * params.pageSize;
-          const filteredParams = { ...params };
+          const currentPage = params.current !== undefined ? params.current : 1;  
+          const apiOffset = (currentPage - 1) * 10;
+          const filteredParams = RemoveEmptyKeys(params);
           delete filteredParams.current;
           delete filteredParams.pageSize;
           const apiSort: string[] = [];
           Object.entries(sort).forEach(([key, value]) => {
             if (value === 'descend') {
-              apiSort.push(`-${key}`)
+              apiSort.push(`-${key}`);
             } else {
-              apiSort.push(`${key}`)
+              apiSort.push(`${key}`);
             }
           });
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
+          const data: Req = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           return GetSystems(data);
         }}
         editable={{
@@ -127,28 +135,37 @@ const TableList: React.FC = () => {
             listsHeight: 400,
           },
         }}
-        // form={{
-        //   // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-        //   syncToUrl: (values, type) => {
-        //     if (type === 'get') {
-        //       return {
-        //         ...values,
-        //         created_at: [values.startTime, values.endTime],
-        //       };
-        //     }
-        //     return values;
+        // rowSelection={{
+        //   onChange: (_, selectedRows) => {
+        //     setSelectedRows(selectedRows);
         //   },
         // }}
         pagination={{
           pageSize: 10,
         }}
-        dateFormatter="string"
         toolBarRender={() => [
-          <Button key="button" icon={<PlusOutlined />} type="primary">
-            新建
-          </Button>,
+          <CreateSystem key="create" reload={actionRef.current?.reload} columns={columns as ProFormColumnsType<SysSystem, 'text'>[]} />,
         ]}
       />
+      {/* {selectedRowsState?.length > 0 && (
+        <FooterToolbar
+          extra={
+            <div>
+              {'已选择'}
+              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{'项'}
+            </div>
+          }
+        >
+          <Button
+            loading={loading}
+            onClick={() => {
+              handleRemove(selectedRowsState);
+            }}
+          >
+            {'批量删除'}
+          </Button>
+        </FooterToolbar>
+      )} */}
     </PageContainer>
   );
 };

@@ -6,17 +6,9 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { GetCronjobLog } from '@/services/sys/sys_cronjob_log';
-
-interface SysCronjobLog {
-  ID: number;
-  CronMethod: string;
-  CronParam: string;
-  StartTime: string;
-  EndTime: string;
-  ExecTime: string;
-  Status: string;
-  ErrMsg: string;
-}
+import type { SysCronjobLog } from '@/interfaces/sys';
+import type { Req } from '@/interfaces/resp';
+import { RemoveEmptyKeys } from '@/utils/obj';
 
 const columns: Array<ProColumns<SysCronjobLog>> = [
   {
@@ -31,12 +23,13 @@ const columns: Array<ProColumns<SysCronjobLog>> = [
   {
     title: '开始时间',
     dataIndex: 'StartTime',
-    width: 200,
+    valueType: 'dateTime',
   },
 
   {
     title: '结束时间',
     dataIndex: 'EndTime',
+    valueType: 'dateTime',
   },
   {
     title: '执行时间(秒)',
@@ -45,12 +38,10 @@ const columns: Array<ProColumns<SysCronjobLog>> = [
   {
     title: '执行状态',
     dataIndex: 'Status',
-    hideInForm: true,
   },
   {
     title: '错误信息',
     dataIndex: 'ErrMsg',
-    hideInForm: true,
   },
 ];
 
@@ -63,19 +54,20 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const apiOffset = (params.current - 1) * params.pageSize;
-          const filteredParams = { ...params };
+          const currentPage = params.current !== undefined ? params.current : 1;  
+          const apiOffset = (currentPage - 1) * 10;
+          const filteredParams = RemoveEmptyKeys(params);
           delete filteredParams.current;
           delete filteredParams.pageSize;
           const apiSort: string[] = [];
           Object.entries(sort).forEach(([key, value]) => {
             if (value === 'descend') {
-              apiSort.push(`-${key}`)
+              apiSort.push(`-${key}`);
             } else {
-              apiSort.push(`${key}`)
+              apiSort.push(`${key}`);
             }
           });
-          const data = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
+          const data: Req = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           return GetCronjobLog(data);
         }}
         editable={{
