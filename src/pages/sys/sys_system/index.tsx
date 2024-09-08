@@ -25,6 +25,7 @@ const TableList: React.FC = () => {
       tooltip: '请求AppId',
       copyable: true,
       sorter: true,
+      editable: false,
     },
     {
       title: '系统',
@@ -36,6 +37,7 @@ const TableList: React.FC = () => {
       tooltip: '请求AppSecret',
       search: false,
       copyable: true,
+      editable: false,
     },
     {
       title: '来源IP',
@@ -44,6 +46,7 @@ const TableList: React.FC = () => {
     {
       title: '操作人',
       dataIndex: 'Operator',
+      hideInForm: true,
     },
     {
       title: '创建时间',
@@ -69,9 +72,9 @@ const TableList: React.FC = () => {
             reload={actionRef.current?.reload}
             columns={columns as ProFormColumnsType<SysSystem, 'text'>[]}
             data={record}
-          />,
-          <a style={{ marginLeft: 8 }} onClick={() => handleDelete(record)}>删除</a>,
-          <a style={{ marginLeft: 8 }} onClick={() => { setopenPerm(true); setCurrentRow(record); }}>授权</a>,
+          />
+          <a style={{ marginLeft: 8 }} onClick={() => handleDelete(record)}>删除</a>
+          <a style={{ marginLeft: 8 }} onClick={() => { setopenPerm(true); setCurrentRow(record); }}>授权</a>
         </>,
       ],
     },

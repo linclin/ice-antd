@@ -2,23 +2,24 @@ import { definePageConfig } from 'ice';
 import React, { useRef, useState } from 'react';
 import { EditableProTable } from '@ant-design/pro-components';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { Modal, message } from 'antd';
-import type { SysSystem, SystemPermission } from '@/interfaces/sys';
+import { Modal, message, Divider } from 'antd';
+import type { SysRole, SysRolePermission } from '@/interfaces/sys';
 import type { Resp } from '@/interfaces/resp';
-import { GetSystemPermById, CreateSystemPerm, DeleteSystemPermById } from '@/services/sys/sys_system';
+import { GetRolePermById, CreateRolePerm, DeleteRolePermById } from '@/services/sys/sys_role';
+import ListRoleUser from './ListRoleUser';
 
-interface ListSystemPermProps {
-   sysSystem: SysSystem | undefined;
+interface ListRolePermProps {
+  sysRole: SysRole | undefined;
 }
-const TableList: React.FC <ListSystemPermProps> = (props) => {
-  const { sysSystem } = props;
+const TableList: React.FC <ListRolePermProps> = (props) => {
+  const { sysRole } = props;
   const actionRef = useRef<ActionType>();
   const [messageApi, contextHolder] = message.useMessage();
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
-  const columns: Array<ProColumns<SystemPermission>> = [
+  const columns: Array<ProColumns<SysRolePermission>> = [
     {
-      title: 'AppId',
-      dataIndex: 'AppId',
+      title: '角色',
+      dataIndex: 'Role',
       formItemProps: (form, { rowIndex }) => {
         return {
           rules:
@@ -27,8 +28,8 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
       },
     },
     {
-      title: 'HTTP接口',
-      dataIndex: 'AbsolutePath',
+      title: '操作对象',
+      dataIndex: 'Obj',
       formItemProps: (form, { rowIndex }) => {
         return {
           rules:
@@ -37,8 +38,8 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
       },
     },
     {
-      title: 'HTTP接口1',
-      dataIndex: 'AbsolutePath1',
+      title: '操作对象1',
+      dataIndex: 'Obj1',
       formItemProps: (form, { rowIndex }) => {
         return {
           rules:
@@ -47,8 +48,8 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
       },
     },
     {
-      title: 'HTTP接口2',
-      dataIndex: 'AbsolutePath2',
+      title: '操作对象2',
+      dataIndex: 'Obj2',
       formItemProps: (form, { rowIndex }) => {
         return {
           rules:
@@ -57,8 +58,8 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
       },
     },
     {
-      title: 'HTTP方法',
-      dataIndex: 'HttpMethod',
+      title: '执行动作',
+      dataIndex: 'Action',
       formItemProps: (form, { rowIndex }) => {
         return {
           rules:
@@ -98,11 +99,11 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
       ],
     },
   ];
-  const handleDelete = (record: SystemPermission) => {
+  const handleDelete = (record: SysRolePermission) => {
     Modal.confirm({
       title: `确认删除${record.ID}?`,
       onOk: async () => {
-        DeleteSystemPermById(sysSystem?.ID, record).then((res: Resp) => {
+        DeleteRolePermById(sysRole?.ID, record).then((res: Resp) => {
           if (res.success === false) {
             messageApi.error(`${record.ID}删除失败:${res.msg}`);
          } else {
@@ -116,8 +117,8 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
     });
   };
 
-  const handleSave = (ID: number, record: SystemPermission) => {
-    CreateSystemPerm(ID, record).then((res: Resp) => {
+  const handleSave = (ID: number, record: SysRolePermission) => {
+    CreateRolePerm(ID, record).then((res: Resp) => {
       if (res.success === false) {
           messageApi.error(`${ID}新增失败:${res.msg}`);
       } else {
@@ -132,14 +133,19 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
   return (
     <>
       {contextHolder}
-      <EditableProTable<SystemPermission>
-        headerTitle="系统权限"
+      <ListRoleUser
+        key={sysRole?.ID}
+        sysRole={sysRole}
+      />
+      <Divider />
+      <EditableProTable<SysRolePermission>
+        headerTitle="角色权限"
         columns={columns}
         actionRef={actionRef}
         cardBordered
         request={() => {
-          if (sysSystem && sysSystem.ID) {
-              return GetSystemPermById(sysSystem.ID);
+          if (sysRole && sysRole.ID) {
+              return GetRolePermById(sysRole.ID);
           } else {
               messageApi.error('数据未定义或ID不存在');
               return Promise.resolve({ data: [], success: true });
@@ -149,10 +155,10 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
         recordCreatorProps={{
           creatorButtonText: '新增权限',
           record: (index) => {
-            if (sysSystem && sysSystem.ID) {
-              return { ID: index + 1, AppId: sysSystem.AppId } as SystemPermission;
+            if (sysRole && sysRole.ID) {
+              return { ID: index + 1, Role: sysRole.Name} as SysRolePermission;
             } else {
-              return { ID: index + 1 } as SystemPermission;
+              return { ID: index + 1 } as SysRolePermission;
             }
           },
         }}
@@ -160,7 +166,7 @@ const TableList: React.FC <ListSystemPermProps> = (props) => {
           type: 'multiple',
           editableKeys,
           onSave: async (rowKey, data, row) => {
-            handleSave(sysSystem?.ID, data);
+            handleSave(sysRole?.ID, data);
           },
           onChange: setEditableRowKeys,
         }}

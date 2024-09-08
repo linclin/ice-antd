@@ -35,10 +35,20 @@ export interface SysRole {
   Name: string;
   Keyword: string;
   Desc: string;
-  Status: string;
+  Status: number;
   Operator: string;
   CreatedAt: string;
   UpdatedAt: string;
+}
+
+export interface SysRolePermission {
+  ID: number;
+	Role: string;
+  Obj: string;
+  Obj1: string;
+  Obj2: string;
+  Action: string;
+  Eft: string;
 }
 
 export interface SysReqApiLog {

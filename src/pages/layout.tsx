@@ -38,9 +38,9 @@ export default function Layout() {
       }}
       footerRender={() => <Footer />}
     >
-       <WaterMark content="运营管理后台">
-          <Outlet />
-       </WaterMark>
+      <WaterMark content={`运营管理后台 ${userState.currentUser.name}`}>
+        <Outlet />
+      </WaterMark>
     </ProLayout>
   );
 }
