@@ -1,6 +1,6 @@
 import { ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm, ActionType } from '@ant-design/pro-components';
-import { Button, message } from 'antd';
+import { message } from 'antd';
 import type { SysSystem } from '@/interfaces/sys';
 import type { Resp } from '@/interfaces/resp';
 import { UpdateSystemById } from '@/services/sys/sys_system';

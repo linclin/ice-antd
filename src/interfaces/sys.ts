@@ -9,6 +9,16 @@ export interface SysSystem {
   UpdatedAt: string;
 }
 
+export interface SystemPermission {
+  ID: number;
+	AppId: string;
+  AbsolutePath: string;
+  AbsolutePath1: string;
+  AbsolutePath2: string;
+  HttpMethod: string;
+  Eft: string;
+}
+
 export interface SysRouter {
   ID: number;
   Name: string;

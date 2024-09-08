@@ -7,16 +7,17 @@ import ProTable from '@ant-design/pro-table';
 import { GetSystems, DeleteSystemById } from '@/services/sys/sys_system';
 import CreateSystem from './components/CreateSystem';
 import UpdateSystem from './components/UpdateSystem';
+import ListSystemPerm from './components/ListSystemPerm';
 import { ProFormColumnsType } from '@ant-design/pro-form';
 import type { SysSystem } from '@/interfaces/sys';
-import type { Req } from '@/interfaces/resp';
+import type { Req, Resp } from '@/interfaces/resp';
 import { RemoveEmptyKeys } from '@/utils/obj';
 
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [showDetail, setShowDetail] = useState<boolean>(false);
-  const [currentRow, setCurrentRow] = useState<SysSystem>(); 
   const [messageApi, contextHolder] = message.useMessage();
+  const [openPerm, setopenPerm] = useState(false);
+  const [currentRow, setCurrentRow] = useState<SysSystem>();
   const columns: Array<ProColumns<SysSystem>> = [
     {
       title: 'AppId',
@@ -64,12 +65,13 @@ const TableList: React.FC = () => {
       render: (text, record, _, action) => [
         <>
           <UpdateSystem
-            key="config"
+            key={record.ID}
             reload={actionRef.current?.reload}
             columns={columns as ProFormColumnsType<SysSystem, 'text'>[]}
             data={record}
           />,
-          <a style={{ marginLeft: 8 }} onClick={() => handleDelete(record)}>删除</a>
+          <a style={{ marginLeft: 8 }} onClick={() => handleDelete(record)}>删除</a>,
+          <a style={{ marginLeft: 8 }} onClick={() => { setopenPerm(true); setCurrentRow(record); }}>授权</a>,
         </>,
       ],
     },
@@ -78,17 +80,26 @@ const TableList: React.FC = () => {
     Modal.confirm({
       title: `确认删除${record.AppId}?`,
       onOk: async () => {
-        try {
-          await DeleteSystemById(record.ID);
-          messageApi.success(`${record.AppId}删除成功`);
-          actionRef.current?.reload();
-        } catch (error) {
-          messageApi.error(`${record.AppId}删除失败:${error}`);
-        }
+        DeleteSystemById(record.ID).then((res: Resp) => {
+          if (res.success === false) {
+            messageApi.error(`${record.AppId}删除失败:${res.msg}`);
+         } else {
+            messageApi.success(`${record.AppId}删除成功`);
+            actionRef.current?.reload();
+         }
+        }).catch((error) => {
+            messageApi.error(`${record.AppId}删除请求错误:${error}`);
+        });
       },
     });
   };
+  const handleOk = () => {
+    setopenPerm(false);
+  };
 
+  const handleCancel = () => {
+    setopenPerm(false);
+  };
   return (
     <PageContainer>
       {contextHolder}
@@ -113,11 +124,8 @@ const TableList: React.FC = () => {
           const data: Req = { filter: { ...filteredParams }, limit: params.pageSize, offset: apiOffset, sort: apiSort };
           return GetSystems(data);
         }}
-        editable={{
-          type: 'multiple',
-        }}
         columnsState={{
-          persistenceKey: 'pro-table-singe-demos',
+          persistenceKey: 'SysSystem',
           persistenceType: 'localStorage',
           onChange(value) {
             console.log('value: ', value);
@@ -135,11 +143,6 @@ const TableList: React.FC = () => {
             listsHeight: 400,
           },
         }}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => {
-        //     setSelectedRows(selectedRows);
-        //   },
-        // }}
         pagination={{
           pageSize: 10,
         }}
@@ -147,25 +150,9 @@ const TableList: React.FC = () => {
           <CreateSystem key="create" reload={actionRef.current?.reload} columns={columns as ProFormColumnsType<SysSystem, 'text'>[]} />,
         ]}
       />
-      {/* {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              {'已选择'}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{'项'}
-            </div>
-          }
-        >
-          <Button
-            loading={loading}
-            onClick={() => {
-              handleRemove(selectedRowsState);
-            }}
-          >
-            {'批量删除'}
-          </Button>
-        </FooterToolbar>
-      )} */}
+      <Modal title="系统权限" width="680" open={openPerm} onOk={handleOk} onCancel={handleCancel} footer={null}>
+        <ListSystemPerm key={currentRow?.ID} sysSystem={currentRow} />
+      </Modal>
     </PageContainer>
   );
 };

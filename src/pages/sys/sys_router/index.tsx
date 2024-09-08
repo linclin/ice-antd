@@ -96,7 +96,7 @@ const TableList: React.FC = () => {
           type: 'multiple',
         }}
         columnsState={{
-          persistenceKey: 'pro-table-singe-demos',
+          persistenceKey: 'SysRouter',
           persistenceType: 'localStorage',
           onChange(value) {
             console.log('value: ', value);
