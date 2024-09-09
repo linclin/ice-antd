@@ -133,6 +133,7 @@ const TableList: React.FC <ListRolePermProps> = (props) => {
   return (
     <>
       {contextHolder}
+      <Divider />
       <ListRoleUser
         key={sysRole?.ID}
         sysRole={sysRole}
