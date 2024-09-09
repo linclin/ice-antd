@@ -2,11 +2,13 @@ import { definePageConfig } from 'ice';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import RcResizeObserver from 'rc-resize-observer';
 import { useState } from 'react';
+import dayjs from 'dayjs';
 
 const { Statistic } = StatisticCard;
 
 export default function Dashboard() {
   const [responsive, setResponsive] = useState(false);
+  const today = dayjs().format('YYYY-MM-DD');
 
   return (
     <RcResizeObserver
@@ -17,7 +19,7 @@ export default function Dashboard() {
     >
       <ProCard
         title="系统运营数据"
-        extra="2019年9月28日 星期五"
+        extra={today}
         split={responsive ? 'horizontal' : 'vertical'}
         headerBordered
         bordered
@@ -27,23 +29,23 @@ export default function Dashboard() {
             <ProCard split="vertical">
               <StatisticCard
                 statistic={{
-                  title: '昨日全部流量',
+                  title: '今日接口访问量',
                   value: 234,
                   description: (
                     <Statistic
-                      title="较本月平均流量"
-                      value="8.04%"
-                      trend="down"
+                      title="接口总访问量"
+                      value="2214134"
+                      // trend="down"
                     />
                   ),
                 }}
               />
               <StatisticCard
                 statistic={{
-                  title: '本月累计流量',
-                  value: 234,
+                  title: '今日外部接口访问量',
+                  value: 32,
                   description: (
-                    <Statistic title="月同比" value="8.04%" trend="up" />
+                    <Statistic title="外部接口总访问量" value="57413398465" trend="up" />
                   ),
                 }}
               />
@@ -51,14 +53,14 @@ export default function Dashboard() {
             <ProCard split="vertical">
               <StatisticCard
                 statistic={{
-                  title: '运行中实验',
-                  value: '12/56',
+                  title: '接入系统',
+                  value: '2',
                   suffix: '个',
                 }}
               />
               <StatisticCard
                 statistic={{
-                  title: '历史实验总数',
+                  title: 'API接口',
                   value: '134',
                   suffix: '个',
                 }}
@@ -66,7 +68,7 @@ export default function Dashboard() {
             </ProCard>
           </ProCard>
           <StatisticCard
-            title="流量走势"
+            title="接口访问走势(周)"
             chart={
               <img
                 src="https://gw.alipayobjects.com/zos/alicdn/_dZIob2NB/zhuzhuangtu.svg"
@@ -76,7 +78,7 @@ export default function Dashboard() {
           />
         </ProCard>
         <StatisticCard
-          title="流量占用情况"
+          title="客户端访问接口情况"
           chart={
             <img
               src="https://gw.alipayobjects.com/zos/alicdn/qoYmFMxWY/jieping2021-03-29%252520xiawu4.32.34.png"
