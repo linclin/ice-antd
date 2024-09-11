@@ -99,3 +99,14 @@ export interface SysApiLog {
   StartTime: string;
   ExecTime: string;
 }
+
+export interface SysData {
+	ApiCount: number;
+	AllApiCount: number;
+	WeekApiCount: any;
+	WeekClientApiCount: any;
+	ReqApiCount: number;
+	AllReqApiCount: number;
+	SystemCount: number;
+	RouterCount: number;
+}

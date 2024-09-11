@@ -25,3 +25,5 @@ pnpm-debug.log*
 # cache
 .eslintcache
 .stylelintcache
+
+yarn.lock

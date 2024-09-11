@@ -1,10 +1,10 @@
 {
   "name": "@ice/antd-pro-scaffold",
   "version": "1.3.0",
-  "description": "ice.js 3 + Ant Design Pro ",
+  "description": "ice.js 3 + Ant Design Pro 5 scaffold ",
   "dependencies": {
-    "@ant-design/charts": "^2.2.1",
     "@ant-design/icons": "^5.4.0",
+    "@ant-design/plots": "^2.3.2",
     "@ant-design/pro-components": "^2.7.16",
     "@ant-design/pro-form": "^2.30.0",
     "@ant-design/pro-layout": "^7.20.0",
