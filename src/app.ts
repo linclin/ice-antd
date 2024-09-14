@@ -1,35 +1,41 @@
-import { defineAppConfig, history, defineDataLoader } from 'ice';
+import { defineAppConfig, history, defineDataLoader, request } from 'ice';
 import { defineAuthConfig } from '@ice/plugin-auth/types';
 import { defineStoreConfig } from '@ice/plugin-store/types';
 import { defineRequestConfig } from '@ice/plugin-request/types';
 import { GetApiToken } from '@/services/api_token';
-import { fetchUserInfo } from './services/user';
+import { message } from 'antd';
+import * as Casdoor from '@/services/casdoor';
 
-// App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({}));
-
-export const authConfig = defineAuthConfig(async (appData) => {
-  const { userInfo = {} } = appData;
-
-  if (userInfo.error) {
-    history?.push(`/login?redirect=${window.location.pathname}`);
+export const storeConfig = defineStoreConfig(async () => {
+    if (!Casdoor.isLoggedIn()) {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+    if (code && state) {
+      const res = await Casdoor.signin(code, state);
+      if (res.success === true) {
+         Casdoor.setToken(res.data.access_token);
+         Casdoor.goToLink('/');
+      }
+    } else {
+      history?.push(Casdoor.getSigninUrl());
+    }
   }
-
-  return {
-    initialAuth: {
-      admin: userInfo.userType === 'admin',
-      user: userInfo.userType === 'user',
-    },
-  };
-});
-
-export const storeConfig = defineStoreConfig(async (appData) => {
-  const { userInfo = {} } = appData;
+  const userInfo = await Casdoor.getUserinfo();
   return {
     initialStates: {
       user: {
-        currentUser: userInfo,
+        currentUser: userInfo.data,
       },
+    },
+  };
+});
+export const authConfig = defineAuthConfig(async () => {
+ return {
+    initialAuth: {
+      // admin: userInfo.userType === 'admin',
+      // user: userInfo.userType === 'user',
     },
   };
 });
@@ -46,19 +52,25 @@ export const requestConfig = defineRequestConfig(() => ({
     request: {
       onConfig: (config) => {
          // 发送请求前：可以对 RequestConfig 做一些统一处理
-         const storedApiToken = localStorage.getItem(`${ICE_API_APPID}-api-token`);
-         if (storedApiToken) {
+        const currentTime = Date.now();
+        const storedUserToken = localStorage.getItem(`${ICE_API_APPID}-user-token`);
+        if (storedUserToken) {
+          const tokenData = JSON.parse(storedUserToken);
+           config.headers = {
+                'X-Auth-Token': tokenData.token,
+           };
+        }
+        const storedApiToken = localStorage.getItem(`${ICE_API_APPID}-api-token`);
+        if (storedApiToken) {
            const tokenData = JSON.parse(storedApiToken);
-           const currentTime = Date.now();
            if (currentTime < tokenData.expires) {
-            currentApiToken = tokenData;
-            config.headers.Authorization = `Bearer ${currentApiToken.token}`;
+            config.headers.Authorization = `Bearer ${tokenData.token}`;
            } else {
             handleTokenExpiration(config);
            }
-         } else {
+        } else {
           handleTokenExpiration(config);
-         }
+        }
         return config;
       },
       onError: (error) => {
@@ -70,7 +82,7 @@ export const requestConfig = defineRequestConfig(() => ({
       onConfig: (response) => {
         // 请求成功：可以做全局的 toast 展示，或者对 response 做一些格式化
         if (response.data.success !== true) {
-          alert('请求失败');
+          message.error(`请求失败${response.data.msg}`);
         }
         return response;
       },
@@ -84,27 +96,13 @@ export const requestConfig = defineRequestConfig(() => ({
 
 export const dataLoader = defineDataLoader(async () => {
   const apiToken = await getApiToken();
-  const userInfo = await getUserInfo();
   return {
     apiToken,
-    userInfo,
   };
 });
-
-async function getUserInfo() {
-  try {
-    const userInfo = await fetchUserInfo();
-    return userInfo;
-  } catch (error) {
-    return {
-      error,
-    };
-  }
-}
 async function getApiToken() {
   try {
     const apiToken = await GetApiToken();
-    console.log('getApiToken  ', apiToken);
     localStorage.setItem(`${ICE_API_APPID}-api-token`, JSON.stringify({ token: apiToken.token, expires: Date.now() + 7200 * 1000 }));
     return apiToken;
   } catch (error) {

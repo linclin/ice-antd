@@ -27,7 +27,7 @@ export default function Layout() {
       }}
       layout="mix"
       rightContentRender={() => (
-        <AvatarDropdown avatar={userState.currentUser.avatar} name={userState.currentUser.name} />
+        <AvatarDropdown avatar={userState.currentUser.avatar} name={userState.currentUser.displayName} />
       )}
       menuDataRender={() => asideMenuConfig}
       menuItemRender={(item, defaultDom) => {
@@ -38,7 +38,7 @@ export default function Layout() {
       }}
       footerRender={() => <Footer />}
     >
-      <WaterMark content={`运营管理后台 ${userState.currentUser.name}`}>
+      <WaterMark content={`运营管理后台 ${userState.currentUser.name} ${userState.currentUser.displayName}`}>
         <Outlet />
       </WaterMark>
     </ProLayout>

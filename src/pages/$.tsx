@@ -8,7 +8,7 @@ const NotFoundPage: React.FC = () => (
     title="404"
     subTitle="你访问的页面不存在"
     extra={
-      <Button type="primary" onClick={() => history?.push('/dashboard')}>
+      <Button type="primary" onClick={() => history?.push('/')}>
         返回
       </Button>
     }

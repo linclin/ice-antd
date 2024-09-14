@@ -16,6 +16,10 @@ export default defineConfig(() => ({
     ICE_API_URL: JSON.stringify(apiUrl),
     ICE_API_APPID: JSON.stringify('api-00000002'),
     ICE_API_APPSECRET: JSON.stringify('61c94399f47c485334b48f8f340bc07b2'),
+    CASDOOR_SERVER_URL: JSON.stringify('http://127.0.0.1:8000'),
+    CASDOOR_CLIENT_ID: JSON.stringify('fcbf0997646218329673'),
+    CASDOOR_ORGANIZATION_NAME: JSON.stringify('built-in'),
+    CASDOOR_APP_NAME: JSON.stringify('app-built-inle'),
   },
   // proxy: {
   //   '/api/': {

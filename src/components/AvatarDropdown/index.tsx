@@ -4,8 +4,8 @@ import { LogoutOutlined } from '@ant-design/icons';
 import { Dropdown, Avatar } from 'antd';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import styles from './index.module.css';
-import { logout } from '@/services/user';
 import store from '@/store';
+import * as Casdoor from '@/services/casdoor';
 
 interface AvatarDropdownProps {
   name: string;
@@ -16,12 +16,8 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
   const [, userDispatcher] = store.useModel('user');
 
   const loginOut = async () => {
-    await logout();
-    const pathname = history?.location?.pathname;
-    history?.push({
-      pathname: '/login',
-      search: pathname ? `redirect=${pathname}` : '',
-    });
+    Casdoor.logout();
+    history?.push(Casdoor.getSigninUrl());
   };
 
   const onMenuClick = useCallback((event: MenuInfo) => {

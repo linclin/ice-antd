@@ -1,16 +1,11 @@
 export interface UserInfo {
+  owner: string;
+  id: string;
   name: string;
+  displayName: string;
   avatar: string;
-  userid: string;
-  userType: 'admin' | 'user';
-}
-
-export interface LoginParams {
-  username: string;
-  password: string;
-}
-
-export interface LoginResult {
-  success?: boolean;
-  userType?: 'user' | 'admin' | 'guest';
-}
+  type: string;
+  createdTime: string;
+	updatedTime: string;
+  email: string;
+};
