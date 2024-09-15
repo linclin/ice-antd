@@ -33,7 +33,7 @@ export default function Dashboard() {
   return <Line {...apiconfig} />;
   };
   const WeekClientApiCountPie = () => {
-    const apidata = data.WeekClientApiCount || [];
+  const apidata = data.WeekClientApiCount || [];
   const apiconfig = {
     data: apidata,
     angleField: 'Count',

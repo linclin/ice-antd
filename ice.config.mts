@@ -3,9 +3,7 @@ import request from '@ice/plugin-request';
 import store from '@ice/plugin-store';
 import auth from '@ice/plugin-auth';
 
-// The project config, see https://v3.ice.work/docs/guide/basic/config
 const minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
-const apiUrl = process.env.NODE_ENV === 'production' ? 'http://example.com:8080' : 'http://127.0.0.1:8080';
 export default defineConfig(() => ({
   ssg: false,
   minify,
@@ -13,13 +11,13 @@ export default defineConfig(() => ({
   compileDependencies: false,
   crossOriginLoading: 'anonymous',
   define: {
-    ICE_API_URL: JSON.stringify(apiUrl),
-    ICE_API_APPID: JSON.stringify('api-00000002'),
-    ICE_API_APPSECRET: JSON.stringify('61c94399f47c485334b48f8f340bc07b2'),
-    CASDOOR_SERVER_URL: JSON.stringify('http://127.0.0.1:8000'),
-    CASDOOR_CLIENT_ID: JSON.stringify('fcbf0997646218329673'),
-    CASDOOR_ORGANIZATION_NAME: JSON.stringify('built-in'),
-    CASDOOR_APP_NAME: JSON.stringify('app-built-inle'),
+    ICE_API_URL: JSON.stringify(process.env.ICE_API_URL),
+    ICE_API_APPID: JSON.stringify(process.env.ICE_API_APPID),
+    ICE_API_APPSECRET: JSON.stringify(process.env.ICE_API_APPSECRET),
+    CASDOOR_SERVER_URL: JSON.stringify(process.env.CASDOOR_SERVER_URL),
+    CASDOOR_CLIENT_ID: JSON.stringify(process.env.CASDOOR_CLIENT_ID),
+    CASDOOR_ORGANIZATION_NAME: JSON.stringify(process.env.CASDOOR_ORGANIZATION_NAME),
+    CASDOOR_APP_NAME: JSON.stringify(process.env.CASDOOR_APP_NAME),
   },
   // proxy: {
   //   '/api/': {

@@ -157,7 +157,7 @@ const TableList: React.FC <ListRolePermProps> = (props) => {
           creatorButtonText: '新增权限',
           record: (index) => {
             if (sysRole && sysRole.ID) {
-              return { ID: index + 1, Role: sysRole.Name} as SysRolePermission;
+              return { ID: index + 1, Role: sysRole.Name } as SysRolePermission;
             } else {
               return { ID: index + 1 } as SysRolePermission;
             }
@@ -180,6 +180,6 @@ export default TableList;
 
 export const pageConfig = definePageConfig(() => {
   return {
-    auth: ['admin'],
+    auth: ['group_admin'],
   };
 });

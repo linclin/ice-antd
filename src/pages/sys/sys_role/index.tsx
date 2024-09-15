@@ -131,7 +131,7 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         cardBordered
         request={(params, sort, filter) => {
-          const currentPage = params.current !== undefined ? params.current : 1;  
+          const currentPage = params.current !== undefined ? params.current : 1;
           const apiOffset = (currentPage - 1) * 10;
           const filteredParams = RemoveEmptyKeys(params);
           delete filteredParams.current;
@@ -185,6 +185,6 @@ export default TableList;
 
 export const pageConfig = definePageConfig(() => {
   return {
-    auth: ['admin'],
+    auth: ['group_admin'],
   };
 });

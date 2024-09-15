@@ -1,28 +1,15 @@
-import { defineAppConfig, history, defineDataLoader, request } from 'ice';
+import { defineAppConfig, history, defineDataLoader, useSearchParams } from 'ice';
 import { defineAuthConfig } from '@ice/plugin-auth/types';
 import { defineStoreConfig } from '@ice/plugin-store/types';
 import { defineRequestConfig } from '@ice/plugin-request/types';
 import { GetApiToken } from '@/services/api_token';
-import { message } from 'antd';
+import { getUserPerm } from '@/services/casbin';
+import { message, Result } from 'antd';
 import * as Casdoor from '@/services/casdoor';
 
 export default defineAppConfig(() => ({}));
-export const storeConfig = defineStoreConfig(async () => {
-    if (!Casdoor.isLoggedIn()) {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    const state = params.get('state');
-    if (code && state) {
-      const res = await Casdoor.signin(code, state);
-      if (res.success === true) {
-         Casdoor.setToken(res.data.access_token);
-         Casdoor.goToLink('/');
-      }
-    } else {
-      history?.push(Casdoor.getSigninUrl());
-    }
-  }
-  const userInfo = await Casdoor.getUserinfo();
+export const storeConfig = defineStoreConfig(async (appData) => {
+  const { userInfo = {} } = appData;
   return {
     initialStates: {
       user: {
@@ -31,11 +18,24 @@ export const storeConfig = defineStoreConfig(async () => {
     },
   };
 });
-export const authConfig = defineAuthConfig(async () => {
- return {
-    initialAuth: {
-      // admin: userInfo.userType === 'admin',
-      // user: userInfo.userType === 'user',
+
+export const authConfig = defineAuthConfig(async (appData) => {
+  const { userInfo = {} } = appData;
+  const userPerm = await getUserPerm(userInfo.data.name);
+  const group = {};
+  for (const groupItem of userPerm.data.group) {
+    group[groupItem] = true;
+  }
+  console.error('getUserPerm', group);
+  return {
+    initialAuth: group,
+    NoAuthFallback: (routeConfig) => {
+      console.error('NoAuthFallback', routeConfig);
+      return (
+        <>
+          <Result status="403" title="403" subTitle="你没有访问权限！请联系管理员授权" />
+        </>
+      );
     },
   };
 });
@@ -95,9 +95,25 @@ export const requestConfig = defineRequestConfig(() => ({
 }));
 
 export const dataLoader = defineDataLoader(async () => {
+  if (!Casdoor.isLoggedIn()) {
+    const [searchParams] = useSearchParams();
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+    if (code && state) {
+      const res = await Casdoor.signin(code, state);
+      if (res.success === true) {
+         Casdoor.setToken(res.data.access_token);
+         Casdoor.goToLink('/');
+      }
+    } else {
+      history?.push(Casdoor.getSigninUrl());
+    }
+  }
+  const userInfo = await Casdoor.getUserInfo();
   const apiToken = await getApiToken();
   return {
     apiToken,
+    userInfo,
   };
 });
 async function getApiToken() {

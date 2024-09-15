@@ -8,4 +8,4 @@ export interface UserInfo {
   createdTime: string;
 	updatedTime: string;
   email: string;
-};
+}

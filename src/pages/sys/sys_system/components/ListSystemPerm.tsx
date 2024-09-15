@@ -173,6 +173,6 @@ export default TableList;
 
 export const pageConfig = definePageConfig(() => {
   return {
-    auth: ['admin'],
+    auth: ['group_admin'],
   };
 });

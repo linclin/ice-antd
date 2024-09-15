@@ -35,7 +35,7 @@ export async function signin(code, state): Promise<Resp> {
  return await request.post(`/api/v1/user/login?state=${state}&code=${code}`);
 }
 
-export async function getUserinfo(): Promise<Resp> {
+export async function getUserInfo(): Promise<Resp> {
  return await request.get('/api/v1/user/info');
 }
 
