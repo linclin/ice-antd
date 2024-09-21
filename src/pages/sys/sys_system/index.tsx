@@ -130,9 +130,7 @@ const TableList: React.FC = () => {
         columnsState={{
           persistenceKey: 'SysSystem',
           persistenceType: 'localStorage',
-          onChange(value) {
-            console.log('value: ', value);
-          },
+          onChange(value) {},
         }}
         rowKey="ID"
         search={{

@@ -96,9 +96,7 @@ const TableList: React.FC = () => {
         columnsState={{
           persistenceKey: 'SysRouter',
           persistenceType: 'localStorage',
-          onChange(value) {
-            console.log('value: ', value);
-          },
+          onChange(value) {},
         }}
         rowKey="ID"
         search={{

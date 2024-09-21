@@ -13,7 +13,6 @@ export const dataLoader = defineDataLoader(async () => {
   // const [searchParams] = useSearchParams();
   const searchParams = new URLSearchParams(window.location.search);
   if (!Casdoor.isLoggedIn()) {
-    console.log('isLoggedIn ', Casdoor.isLoggedIn());
     const code = searchParams.get('code');
     const state = searchParams.get('state');
     if (code !== null && state !== null) {
@@ -50,7 +49,6 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 export const authConfig = defineAuthConfig(async (appData) => {
   const { userInfo = {} } = appData;
   const userPerm = await getUserPerm(userInfo.data.name);
-  console.log('userPerm', userPerm);
   const group = {};
   if (userInfo.data.name == 'admin') {
      group['group_admin'] = true;
@@ -67,7 +65,6 @@ export const authConfig = defineAuthConfig(async (appData) => {
   return {
     initialAuth: group,
     NoAuthFallback: (routeConfig) => {
-      console.error('NoAuthFallback', routeConfig);
       return (
         <>
           <Result status="403" title="403" subTitle="你没有访问权限！请联系管理员授权" />
@@ -156,7 +153,6 @@ function handleTokenExpiration(config) {
       requestLock = false; // 释放请求锁
     })
     .catch(() => {
-      console.error('Failed to fetch a new token');
       requestLock = false; // 释放请求锁
       // 进一步的错误处理逻辑，例如提示用户重新登录
     });
