@@ -61,5 +61,6 @@ docker load -i ice-antd-1.0.0.tar
 ```
 ## 容器运行-Docker运行
 ``` shell
+docker rm -f ice-antd
 docker run -d --name ice-antd --network=host --restart always registry.cn-shenzhen.aliyuncs.com/dev-ops/ice-antd:1.0.0
 ```

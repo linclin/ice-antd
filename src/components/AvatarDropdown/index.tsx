@@ -17,7 +17,7 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
 
   const loginOut = async () => {
     Casdoor.logout();
-    history?.push(Casdoor.getSigninUrl());
+    Casdoor.goToLink(Casdoor.getSigninUrl());
   };
 
   const onMenuClick = useCallback((event: MenuInfo) => {

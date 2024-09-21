@@ -50,16 +50,17 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 export const authConfig = defineAuthConfig(async (appData) => {
   const { userInfo = {} } = appData;
   const userPerm = await getUserPerm(userInfo.data.name);
+  console.log('userPerm', userPerm);
   const group = {};
   if (userInfo.data.name == 'admin') {
      group['group_admin'] = true;
   } else {
-    if (userPerm.data.success) {
+    if (userPerm.success === true) {
       for (const groupItem of userPerm.data.group) {
         group[groupItem] = true;
       }
     } else {
-      message.error(`请求用户权限失败${userPerm.data.msg}`);
+      message.error(`请求用户权限失败${userPerm.msg}`);
       group['group_user'] = true;
     }
   }
