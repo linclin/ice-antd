@@ -23,24 +23,24 @@ const App: React.FC <ListRoleUserProps> = (props) => {
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<InputRef>(null);
   const [data, setData] = useState<string[]>([]);
-  useEffect(() => {
-    GetRoleUsersById(sysRole?.ID).then((res: Resp) => {
-        if (res.success === false) {
-          messageApi.error(`${sysRole?.Name}查询用户失败:${res.msg}`);
-       } else {
-        setData(res.data);
-       }
-      }).catch((error) => {
-          messageApi.error(`${sysRole?.Name}查询用户请求错误:${error}`);
-      });
-  }, []);
+  // useEffect(() => {
+  //   GetRoleUsersById(sysRole?.ID).then((res: Resp) => {
+  //       if (res.success === false) {
+  //         messageApi.error(`${sysRole?.Name}查询用户失败:${res.msg}`);
+  //      } else {
+  //       setData(res.data);
+  //      }
+  //     }).catch((error) => {
+  //         messageApi.error(`${sysRole?.Name}查询用户请求错误:${error}`);
+  //     });
+  // }, []);
 
 
-  useEffect(() => {
-    if (inputVisible) {
-      inputRef.current?.focus();
-    }
-  }, [inputVisible]);
+  // useEffect(() => {
+  //   if (inputVisible) {
+  //     inputRef.current?.focus();
+  //   }
+  // }, [inputVisible]);
 
   const handleClose = (inputValue: string) => {
     DeleteRoleUserById(sysRole?.ID, [inputValue]).then((res: Resp) => {

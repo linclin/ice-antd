@@ -1,3 +1,4 @@
+import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-form';
 import { BetaSchemaForm, ActionType } from '@ant-design/pro-components';
 import { message } from 'antd';

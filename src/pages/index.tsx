@@ -113,7 +113,7 @@ export default function Dashboard() {
               </ProCard>
             </ProCard>
             <StatisticCard
-              title="系统接口请求趋势(本周)"
+              title="系统接口请求趋势(最近7天)"
               chart={
                 <WeekApiCountLine />
               }
@@ -121,7 +121,7 @@ export default function Dashboard() {
           </ProCard>
           <ProCard split="horizontal">
             <StatisticCard
-              title="客户端访问接口情况(本周)"
+              title="客户端访问接口情况(最近7天)"
               chart={
                 <WeekClientApiCountPie />
               }

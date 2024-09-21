@@ -1,3 +1,4 @@
+import React from 'react';
 import { ProFormColumnsType } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
 import { BetaSchemaForm, ActionType } from '@ant-design/pro-components';

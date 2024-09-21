@@ -8,6 +8,34 @@ import { message, Result } from 'antd';
 import * as Casdoor from '@/services/casdoor';
 
 export default defineAppConfig(() => ({}));
+
+export const dataLoader = defineDataLoader(async () => {
+  // const [searchParams] = useSearchParams();
+  const searchParams = new URLSearchParams(window.location.search);
+  if (!Casdoor.isLoggedIn()) {
+    console.log('isLoggedIn ', Casdoor.isLoggedIn());
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+    if (code !== null && state !== null) {
+      const res = await Casdoor.signin(code, state);
+      if (res.success === true) {
+         Casdoor.setToken(res.data.access_token);
+         Casdoor.goToLink('/');
+      } else {
+         Casdoor.goToLink(Casdoor.getSigninUrl());
+      }
+    } else {
+      Casdoor.goToLink(Casdoor.getSigninUrl());
+    }
+  }
+  const userInfo = await Casdoor.getUserInfo();
+  const apiToken = await getApiToken();
+  return {
+    apiToken,
+    userInfo,
+  };
+});
+
 export const storeConfig = defineStoreConfig(async (appData) => {
   const { userInfo = {} } = appData;
   return {
@@ -23,10 +51,18 @@ export const authConfig = defineAuthConfig(async (appData) => {
   const { userInfo = {} } = appData;
   const userPerm = await getUserPerm(userInfo.data.name);
   const group = {};
-  for (const groupItem of userPerm.data.group) {
-    group[groupItem] = true;
+  if (userInfo.data.name == 'admin') {
+     group['group_admin'] = true;
+  } else {
+    if (userPerm.data.success) {
+      for (const groupItem of userPerm.data.group) {
+        group[groupItem] = true;
+      }
+    } else {
+      message.error(`请求用户权限失败${userPerm.data.msg}`);
+      group['group_user'] = true;
+    }
   }
-  console.error('getUserPerm', group);
   return {
     initialAuth: group,
     NoAuthFallback: (routeConfig) => {
@@ -94,28 +130,6 @@ export const requestConfig = defineRequestConfig(() => ({
   },
 }));
 
-export const dataLoader = defineDataLoader(async () => {
-  if (!Casdoor.isLoggedIn()) {
-    const [searchParams] = useSearchParams();
-    const code = searchParams.get('code');
-    const state = searchParams.get('state');
-    if (code && state) {
-      const res = await Casdoor.signin(code, state);
-      if (res.success === true) {
-         Casdoor.setToken(res.data.access_token);
-         Casdoor.goToLink('/');
-      }
-    } else {
-      history?.push(Casdoor.getSigninUrl());
-    }
-  }
-  const userInfo = await Casdoor.getUserInfo();
-  const apiToken = await getApiToken();
-  return {
-    apiToken,
-    userInfo,
-  };
-});
 async function getApiToken() {
   try {
     const apiToken = await GetApiToken();
