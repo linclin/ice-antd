@@ -5,7 +5,7 @@ ice.js 3 + Ant Design Pro 5实现的中后台React前端开发脚手架
 <p align="center">
 <img src="https://img.shields.io/badge/React-18.3.1-brightgreen" alt="React version"/>
 <img src="https://img.shields.io/badge/ice.js-3.4.11-brightgreen" alt="ice.js version"/>
-<img src="https://img.shields.io/badge/Ant Design Pro-5.20.6-brightgreen" alt="Ant Design Pro version"/> 
+<img src="https://img.shields.io/badge/Ant Design Pro-5.21.1-brightgreen" alt="Ant Design Pro version"/> 
 </p>
 </div>
 
